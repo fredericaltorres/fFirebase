@@ -18,14 +18,37 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
+    <script defer src="https://unpkg.com/react@16.5.2/umd/react.development.js"></script>
+    <script defer src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+
   </head>
   <body>
     <h1>Hello Firebase world</h1>
     <button onclick="googleLogin()">Login</button>
     <input onchange="updatePost(event)">
+    <input type="file" onChange="uploadFile(this.files)">
+    <hr/>
+    <img id="imgLoad" src="" width="400vw" height="250vw">    
+    <button onclick="loadFile()">Load File</button>
+    <hr/>
+    <div id="root"></div>
   </body>
   <script>
     console.log('Logging...');
+
+    // function reactStart() {
+        
+    //     function formatName(user) {
+    //         return user.firstName + ' ' + user.lastName;
+    //     }
+    //     const user = {
+    //         firstName: 'Harper',
+    //         lastName: 'Perez',
+    //     };
+    //     const element = <h1>Hello, {formatName(user)}!</h1>;
+    //     // ReactDOM.render(element, document.getElementById('root'));
+    //     alert(1);
+    // }
 
     function getFirestoreDB() {
         const app = firebase.app();
@@ -34,11 +57,33 @@
         firestore.settings(settings);
         return firestore;
     }
+    function getStorageRef() {
+        return firebase.storage().ref();        
+    }
     function getPostsCollection() {
         return getFirestoreDB().collection('posts');
     }
     function getProductsCollection() {
         return getFirestoreDB().collection('products');
+    }
+    // https://firebase.google.com/docs/storage/web/download-files
+    function loadFile() {
+        const storageRef = getStorageRef();
+        const horseRef = storageRef.child('horse.png').getDownloadURL().then(url => {
+            console.log(`image url:${url}`);
+            document.querySelector('#imgLoad').setAttribute('src', url);
+        });
+    }
+    function uploadFile(files) {
+        debugger
+        const storageRef = getStorageRef();
+        const horseRef = storageRef.child('horse.png');
+        const file = files.item(0);
+        const task = horseRef.put(file).then(snapshot => {
+            console.dir(snapshot);
+            const url = snapshot.downloadURL;
+            document.querySelector('#imgLoad').setAttribute(src, url);
+        });
     }
     function updatePost(e) {
       debugger;
@@ -48,8 +93,7 @@
     }    
     function displayFirstPost() {
         const dbCollectionOfPosts = getPostsCollection();
-        // reference the post in the collection posts via the property 'firstpost'
-        // the property 'firstpost' is a unique key in posts.
+        // reference the post in the collection posts via the property 'firstpost' the property 'firstpost' is a unique key in posts.
         const myPost = dbCollectionOfPosts.doc('firstpost');
         /* GET ITEM
         myPost.get().then(myPostDoc => {
@@ -66,8 +110,10 @@
         });
     }
     function displayProducts() {
+        document.writeln(`Loading products...<br/>`);
         const productsRef = getProductsCollection();
-        const query = productsRef.where('price', '>=', 10);
+        // const query = productsRef.where('price', '>=', 10);
+        const query = productsRef.orderBy('price', 'desc').limit(100);
         query.get().then(products => {
             products.forEach(doc => {
                 const data = doc.data();
@@ -77,7 +123,7 @@
     }
     document.addEventListener("DOMContentLoaded", (event) => {
         // displayFirstPost();
-        displayProducts();
+        // displayProducts();
     });
     function googleLogin() {
         const provider = new firebase.auth.GoogleAuthProvider();
