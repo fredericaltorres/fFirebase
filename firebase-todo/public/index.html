@@ -1,0 +1,94 @@
+<!-- <!DOCTYPE html> -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/5.5.5/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/5.5.5/firebase-auth.js"></script>
+
+    <!-- <script defer src="/__/firebase/5.5.5/firebase-database.js"></script> -->
+    <script defer src="/__/firebase/5.5.5/firebase-firestore.js"></script>
+
+    <script defer src="/__/firebase/5.5.5/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/5.5.5/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+  </head>
+  <body>
+    <h1>Hello Firebase world</h1>
+    <button onclick="googleLogin()">Login</button>
+    <input onchange="updatePost(event)">
+  </body>
+  <script>
+    console.log('Logging...');
+
+    function getFirestoreDB() {
+        const app = firebase.app();
+        const firestore = firebase.firestore();
+        const settings = {timestampsInSnapshots: true};
+        firestore.settings(settings);
+        return firestore;
+    }
+    function getPostsCollection() {
+        return getFirestoreDB().collection('posts');
+    }
+    function getProductsCollection() {
+        return getFirestoreDB().collection('products');
+    }
+    function updatePost(e) {
+      debugger;
+        const dbCollectionOfPosts = getPostsCollection();
+        const myPost = dbCollectionOfPosts.doc('firstpost');
+        myPost.update({ title: e.target.value });
+    }    
+    function displayFirstPost() {
+        const dbCollectionOfPosts = getPostsCollection();
+        // reference the post in the collection posts via the property 'firstpost'
+        // the property 'firstpost' is a unique key in posts.
+        const myPost = dbCollectionOfPosts.doc('firstpost');
+        /* GET ITEM
+        myPost.get().then(myPostDoc => {
+            const myPostDocData = myPostDoc.data();
+            ...
+        });
+        */
+        // Refresh every time the document is updated
+        myPost.onSnapshot(myPostDoc => {
+            const myPostDocData = myPostDoc.data();
+            console.dir(myPostDocData);
+            const { view, title, createdAt } = myPostDocData;
+            document.writeln(`<b>Post:</b> ${title}, view:${view}, createdAt:${createdAt} <br/>`);
+        });
+    }
+    function displayProducts() {
+        const productsRef = getProductsCollection();
+        const query = productsRef.where('price', '>=', 10);
+        query.get().then(products => {
+            products.forEach(doc => {
+                const data = doc.data();
+                document.writeln(`<b>Product:</b> ${data.name}, ${data.price} <br/>`);
+            });
+        });
+    }
+    document.addEventListener("DOMContentLoaded", (event) => {
+        // displayFirstPost();
+        displayProducts();
+    });
+    function googleLogin() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithPopup(provider).then((result) => {
+          const user = result.user;
+          console.dir(user);
+          document.writeln(`Hello ${user.displayName}`);
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+  </script>
+  <!-- <script src="app.js"></script> -->
+</html>
