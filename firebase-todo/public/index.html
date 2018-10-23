@@ -18,9 +18,6 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
-    <script defer src="https://unpkg.com/react@16.5.2/umd/react.development.js"></script>
-    <script defer src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
-
   </head>
   <body>
     <h1>Hello Firebase world</h1>
@@ -33,39 +30,10 @@
     <hr/>
     <div id="root"></div>
   </body>
+  <script src="./app.js"></script>
   <script>
-    console.log('Logging...');
-
-    // function reactStart() {
-        
-    //     function formatName(user) {
-    //         return user.firstName + ' ' + user.lastName;
-    //     }
-    //     const user = {
-    //         firstName: 'Harper',
-    //         lastName: 'Perez',
-    //     };
-    //     const element = <h1>Hello, {formatName(user)}!</h1>;
-    //     // ReactDOM.render(element, document.getElementById('root'));
-    //     alert(1);
-    // }
-
-    function getFirestoreDB() {
-        const app = firebase.app();
-        const firestore = firebase.firestore();
-        const settings = {timestampsInSnapshots: true};
-        firestore.settings(settings);
-        return firestore;
-    }
-    function getStorageRef() {
-        return firebase.storage().ref();        
-    }
-    function getPostsCollection() {
-        return getFirestoreDB().collection('posts');
-    }
-    function getProductsCollection() {
-        return getFirestoreDB().collection('products');
-    }
+    console.log('Starting page...');
+   
     // https://firebase.google.com/docs/storage/web/download-files
     function loadFile() {
         const storageRef = getStorageRef();
@@ -75,7 +43,6 @@
         });
     }
     function uploadFile(files) {
-        debugger
         const storageRef = getStorageRef();
         const horseRef = storageRef.child('horse.png');
         const file = files.item(0);
@@ -125,16 +92,5 @@
         // displayFirstPost();
         // displayProducts();
     });
-    function googleLogin() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).then((result) => {
-          const user = result.user;
-          console.dir(user);
-          document.writeln(`Hello ${user.displayName}`);
-        }).catch((error) => {
-            console.error(error);
-        });
-    }
   </script>
-  <!-- <script src="app.js"></script> -->
 </html>

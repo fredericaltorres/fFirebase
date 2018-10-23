@@ -25,7 +25,11 @@ C:\>firebase serve
 C:\>firebase deploy
     Project Console: https://console.firebase.google.com/project/fredtodo-f553b/overview
     Hosting URL: https://fredtodo-f553b.firebaseapp.com
+# Functions    
 C:\>firebase init functions
+C:\>set NODE_TLS_REJECT_UNAUTHORIZED=0
+C:\>cd functions
+C:\>firebase deploy --only --debug functions
 
 ```
 
